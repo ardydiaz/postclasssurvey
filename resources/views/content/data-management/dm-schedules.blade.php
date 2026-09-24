@@ -317,6 +317,7 @@
             };
             const deletedSchedulesUrl = '{{ route('dm.schedules.deleted') }}';
             const restoreScheduleUrlTemplate = '{{ route('dm.schedules.restore', ':id') }}';
+            const forceDeleteScheduleUrlTemplate = '{{ route('dm.schedules.force-delete', ':id') }}';
 
             document.addEventListener('DOMContentLoaded', () => {
                 initScheduleCourseDropdowns();
@@ -1082,11 +1083,16 @@
 
                     if (this.deletedTableBody) {
                         this.deletedTableBody.addEventListener('click', (event) => {
-                            const button = event.target.closest('[data-restore-schedule]');
-                            if (!button) {
+                            const restoreButton = event.target.closest('[data-restore-schedule]');
+                            if (restoreButton) {
+                                this.restoreDeletedSchedule(Number(restoreButton.dataset.restoreSchedule), restoreButton);
                                 return;
                             }
-                            this.restoreDeletedSchedule(Number(button.dataset.restoreSchedule), button);
+
+                            const forceDeleteButton = event.target.closest('[data-force-delete-schedule]');
+                            if (forceDeleteButton) {
+                                this.forceDeleteSchedule(Number(forceDeleteButton.dataset.forceDeleteSchedule), forceDeleteButton);
+                            }
                         });
                     }
                 }
@@ -1128,9 +1134,14 @@
                             <td><span class="schedule-pill" data-pill-palette="blue" data-pill-value="schedule">${this.escapeHtml(schedule.schedule || 'N/A')}</span></td>
                             <td>${this.escapeHtml(schedule.deleted_at || 'N/A')}</td>
                             <td class="text-end">
-                                <button type="button" class="btn btn-sm btn-restore-schedule" data-restore-schedule="${schedule.id}">
-                                    <i class="fa-solid fa-rotate-left me-1"></i> Restore
-                                </button>
+                                <div class="d-inline-flex flex-wrap justify-content-end gap-2">
+                                    <button type="button" class="btn btn-sm btn-restore-schedule" data-restore-schedule="${schedule.id}">
+                                        <i class="fa-solid fa-rotate-left me-1"></i> Restore
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-force-delete-schedule" data-force-delete-schedule="${schedule.id}" data-schedule-name="${this.escapeAttribute(schedule.course || 'this schedule')}">
+                                        <i class="fa-solid fa-trash-can me-1"></i> Delete Permanently
+                                    </button>
+                                </div>
                             </td>
                         </tr>
                     `).join('');
@@ -1161,6 +1172,36 @@
                     } catch (error) {
                         this.showDeletedSchedulesAlert('danger', error.message || 'Failed to restore schedule.');
                         this.toggleButtonLoading(button, false, 'Restore');
+                    }
+                }
+
+                async forceDeleteSchedule(scheduleId, button) {
+                    if (!scheduleId) {
+                        return;
+                    }
+
+                    const scheduleName = button?.dataset?.scheduleName || 'this schedule';
+                    if (!confirm(`Permanently delete ${scheduleName}? This cannot be undone.`)) {
+                        return;
+                    }
+
+                    this.toggleButtonLoading(button, true, 'Delete Permanently', 'Deleting...');
+
+                    try {
+                        const response = await fetch(forceDeleteScheduleUrlTemplate.replace(':id', scheduleId), {
+                            method: 'DELETE',
+                            headers: this.deleteHeaders(),
+                        });
+                        const payload = await response.json().catch(() => ({}));
+                        if (!response.ok || !payload.success) {
+                            throw new Error(payload.message || 'Failed to permanently delete schedule.');
+                        }
+
+                        this.showDeletedSchedulesAlert('success', payload.message || 'Schedule permanently deleted successfully.');
+                        await this.loadDeletedSchedules();
+                    } catch (error) {
+                        this.showDeletedSchedulesAlert('danger', error.message || 'Failed to permanently delete schedule.');
+                        this.toggleButtonLoading(button, false, 'Delete Permanently');
                     }
                 }
 

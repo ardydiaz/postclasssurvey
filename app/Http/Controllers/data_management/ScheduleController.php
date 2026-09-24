@@ -289,6 +289,20 @@ class ScheduleController extends Controller
         ]);
     }
 
+    public function forceDelete(int $id): JsonResponse
+    {
+        $this->authorizeAdminOnly();
+
+        $schedule = Schedule::onlyTrashed()->findOrFail($id);
+        $schedule->forceDelete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Schedule permanently deleted successfully.',
+            'deleted_id' => $id,
+        ]);
+    }
+
     private function resolveFacultyCourseForScheduleSubjectType(FacultyCourse $facultyCourse, string $subjectType): FacultyCourse
     {
         $facultyCourse->loadMissing('course');

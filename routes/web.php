@@ -134,6 +134,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/data-management/schedules', [ScheduleController::class, 'store'])->name('dm.schedules.store')->middleware('access.level:schedules');
     Route::get('/data-management/schedules/deleted', [ScheduleController::class, 'deletedList'])->name('dm.schedules.deleted')->middleware('admin');
     Route::post('/data-management/schedules/restore/{id}', [ScheduleController::class, 'restore'])->name('dm.schedules.restore')->middleware('admin');
+    Route::delete('/data-management/schedules/force-delete/{id}', [ScheduleController::class, 'forceDelete'])->name('dm.schedules.force-delete')->middleware('admin');
     Route::put('/data-management/schedules/{schedule}', [ScheduleController::class, 'update'])->name('dm.schedules.update')->middleware('access.level:schedules');
     Route::delete('/data-management/schedules/{schedule}', [ScheduleController::class, 'destroy'])->name('dm.schedules.destroy')->middleware('access.level:schedules');
     Route::post('/data-management/schedules/bulk-delete', [ScheduleController::class, 'bulkDestroy'])->name('dm.schedules.bulk-destroy')->middleware('access.level:schedules');

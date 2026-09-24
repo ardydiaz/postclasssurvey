@@ -148,6 +148,24 @@
             box-shadow: 0 0.65rem 1.35rem rgba(230, 164, 49, 0.24);
         }
 
+        .btn-force-delete-schedule {
+            background: linear-gradient(135deg, #dc2626, #991b1b);
+            border: 1px solid #b91c1c;
+            color: #ffffff;
+            border-radius: 999px;
+            font-weight: 700;
+            padding: 0.45rem 0.9rem;
+            box-shadow: 0 0.55rem 1.2rem rgba(220, 38, 38, 0.18);
+        }
+
+        .btn-force-delete-schedule:hover,
+        .btn-force-delete-schedule:focus {
+            background: linear-gradient(135deg, #ffb736, #ef4444);
+            border-color: #ef4444;
+            color: #3a0050;
+            box-shadow: 0 0.65rem 1.35rem rgba(239, 68, 68, 0.24);
+        }
+
         .time-dropdown {
             position: relative;
         }
