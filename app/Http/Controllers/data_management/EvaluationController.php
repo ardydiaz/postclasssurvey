@@ -1540,10 +1540,10 @@ class EvaluationController extends Controller
         }
 
         // Apply date filters only if provided
-        if ($startDate || $endDate) {
-            $start = null;
-            $end = null;
+        $start = null;
+        $end = null;
 
+        if ($startDate || $endDate) {
             if ($startDate) {
                 try {
                     $start = Carbon::parse($startDate)->startOfDay();
@@ -1633,6 +1633,7 @@ class EvaluationController extends Controller
             fwrite($handle, "\xEF\xBB\xBF");
 
             fputcsv($handle, [
+                'Date',
                 'Faculty Name',
                 'Faculty Department',
                 'Academic Year',
@@ -1652,6 +1653,7 @@ class EvaluationController extends Controller
                     : $this->resolveResponseDepartmentForExport($response, $evaluation);
 
                 fputcsv($handle, [
+                    $response->created_at ? $response->created_at->format('M d, Y') : '',
                     $evaluation->resolved_faculty_name,
                     $exportDepartment,
                     $evaluation->academic_year,

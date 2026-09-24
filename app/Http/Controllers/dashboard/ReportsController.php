@@ -1087,6 +1087,7 @@ class ReportsController extends Controller
 
         // Prepare data for export
         $headers = [
+            'DATE',
             'FACULTY NAME',
             'FACULTY DEPARTMENT',
             'ACADEMIC YEAR',
@@ -1103,6 +1104,7 @@ class ReportsController extends Controller
         $data = [];
         if ($responses->isEmpty()) {
             $data[] = [
+                '',
                 'No matching responses found',
                 $department,
                 $academicYear === 'all' ? 'All Academic Years' : $academicYear,
@@ -1133,6 +1135,7 @@ class ReportsController extends Controller
             $facultyName = preg_replace('/\s+/', ' ', trim($facultyName));
             
             $data[] = [
+                $response->created_at ? Carbon::parse($response->created_at)->format('M d, Y') : '',
                 $facultyName,
                 $department,
                 $response->academic_year ?? '',
